@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Gestor de Máquinas Virtuales</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			min-height: 100vh;
+			padding: 20px;
+		}
+
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			background: white;
+			border-radius: 10px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+			overflow: hidden;
+		}
+
+		header {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			color: white;
+			padding: 30px;
+			text-align: center;
+		}
+
+		header h1 {
+			font-size: 2.5em;
+			margin-bottom: 10px;
+		}
+
+		header p {
+			font-size: 1.1em;
+			opacity: 0.9;
+		}
+
+		.dashboard {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+			gap: 20px;
+			padding: 30px;
+		}
+
+		.section {
+			background: #f8f9fa;
+			border: 2px solid #e0e0e0;
+			border-radius: 8px;
+			padding: 20px;
+			transition: all 0.3s ease;
+		}
+
+		.section:hover {
+			border-color: #667eea;
+			box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+		}
+
+		.section h2 {
+			color: #667eea;
+			margin-bottom: 20px;
+			font-size: 1.5em;
+			border-bottom: 2px solid #667eea;
+			padding-bottom: 10px;
+		}
+
+		.form-group {
+			margin-bottom: 15px;
+		}
+
+		label {
+			display: block;
+			margin-bottom: 5px;
+			color: #333;
+			font-weight: 500;
+		}
+
+		input, textarea, select {
+			width: 100%;
+			padding: 10px;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+			font-family: inherit;
+			font-size: 1em;
+		}
+
+		input:focus, textarea:focus, select:focus {
+			outline: none;
+			border-color: #667eea;
+			box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+		}
+
+		textarea {
+			resize: vertical;
+			min-height: 80px;
+		}
+
+		.button-group {
+			display: flex;
+			gap: 10px;
+			margin-top: 15px;
+		}
+
+		button, a.btn {
+			flex: 1;
+			padding: 10px 15px;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+			font-weight: 500;
+			transition: all 0.3s ease;
+			text-decoration: none;
+			text-align: center;
+			display: inline-block;
+		}
+
+		.btn-primary {
+			background: #667eea;
+			color: white;
+		}
+
+		.btn-primary:hover {
+			background: #5568d3;
+			transform: translateY(-2px);
+		}
+
+		.btn-success {
+			background: #48bb78;
+			color: white;
+		}
+
+		.btn-success:hover {
+			background: #38a169;
+		}
+
+		.btn-danger {
+			background: #f56565;
+			color: white;
+		}
+
+		.btn-danger:hover {
+			background: #e53e3e;
+		}
+
+		.btn-warning {
+			background: #ed8936;
+			color: white;
+		}
+
+		.btn-warning:hover {
+			background: #dd6b20;
+		}
+
+		.card {
+			background: white;
+			border: 1px solid #e0e0e0;
+			border-radius: 8px;
+			padding: 15px;
+			margin-bottom: 15px;
+		}
+
+		.card h3 {
+			color: #333;
+			margin-bottom: 10px;
+		}
+
+		.card p {
+			color: #666;
+			margin-bottom: 10px;
+			font-size: 0.9em;
+		}
+
+		.status {
+			display: inline-block;
+			padding: 5px 10px;
+			border-radius: 20px;
+			font-size: 0.85em;
+			font-weight: 500;
+		}
+
+		.status.online {
+			background: #c6f6d5;
+			color: #22543d;
+		}
+
+		.status.offline {
+			background: #fed7d7;
+			color: #742a2a;
+		}
+
+		.status.ready {
+			background: #bee3f8;
+			color: #2c5282;
+		}
+
+		.status.pending {
+			background: #feebc8;
+			color: #7c2d12;
+		}
+
+		.empty-state {
+			text-align: center;
+			padding: 30px;
+			color: #999;
+		}
+
+		.empty-state svg {
+			width: 80px;
+			height: 80px;
+			margin-bottom: 15px;
+			opacity: 0.5;
+		}
+
+		@media (max-width: 768px) {
+			.dashboard {
+				grid-template-columns: 1fr;
+			}
+
+			.button-group {
+				flex-direction: column;
+			}
+
+			header h1 {
+				font-size: 1.8em;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>🖥️ Gestor de Máquinas Virtuales</h1>
+			<p>Gestiona máquinas virtuales en VirtualBox con autenticación SSH</p>
+		</header>
+
+		<div class="dashboard">
+			<!-- Sección: Agregar Máquina Base -->
+			<section class="section">
+				<h2>➕ Agregar Máquina Virtual Base</h2>
+				<form method="POST" action="/machines/base/add">
+					<div class="form-group">
+						<label for="base_name">Nombre de Máquina:</label>
+						<input type="text" id="base_name" name="name" required placeholder="Ej: Ubuntu-Base-01">
+					</div>
+					<div class="form-group">
+						<label for="base_desc">Descripción:</label>
+						<textarea id="base_desc" name="description" placeholder="Describa la máquina..."></textarea>
+					</div>
+					<button type="submit" class="btn btn-primary" style="width: 100%;">Crear Máquina Base</button>
+				</form>
+			</section>
+
+			<!-- Sección: Máquinas Base -->
+			<section class="section">
+				<h2>🔧 Máquinas Virtuales Base</h2>
+				{{if .BaseMachines}}
+					{{range .BaseMachines}}
+					<div class="card">
+						<h3>{{.Name}}</h3>
+						<p>{{.Description}}</p>
+						<p>
+							{{if .IsRunning}}
+								<span class="status online">En línea</span>
+							{{else}}
+								<span class="status offline">Apagada</span>
+							{{end}}
+						</p>
+						{{if .RootKeysReady}}
+							<p><span class="status ready">✓ Llaves de Root</span></p>
+						{{end}}
+						
+						<div class="button-group" style="margin-top: 10px;">
+							{{if not .RootKeysReady}}
+								<form method="POST" action="/machines/base/{{.ID}}/keys/root" style="flex: 1;">
+									<button type="submit" class="btn btn-success">Crear Llaves Root</button>
+								</form>
+							{{else}}
+								<a href="/machines/base/{{.ID}}/keys/root/download" class="btn btn-success">Descargar Llaves</a>
+							{{end}}
+						</div>
+
+						{{if .RootKeysReady}}
+						<div class="button-group">
+							<form method="POST" action="/machines/base/{{.ID}}/disks/create" style="flex: 1;">
+								<div class="form-group">
+									<input type="text" name="disk_name" placeholder="Nombre del disco" required>
+								</div>
+								<button type="submit" class="btn btn-warning">Crear Disco Multiconexión</button>
+							</form>
+						</div>
+						{{end}}
+					</div>
+					{{end}}
+				{{else}}
+					<div class="empty-state">
+						<p>No hay máquinas base. ¡Crea una!</p>
+					</div>
+				{{end}}
+			</section>
+
+			<!-- Sección: Discos Multiconexión -->
+			<section class="section">
+				<h2>💾 Discos Multiconexión</h2>
+				{{if .MediaDisks}}
+					{{range .MediaDisks}}
+					<div class="card">
+						<h3>{{.Name}}</h3>
+						<p>Tamaño: {{.Size}} MB</p>
+						{{if .IsConnected}}
+							<p><span class="status online">Conectado</span></p>
+						{{else}}
+							<p><span class="status offline">Disponible</span></p>
+						{{end}}
+						{{if .IsReady}}
+							<p><span class="status ready">✓ Listo</span></p>
+						{{end}}
+						
+						<div class="button-group">
+							{{if not .IsConnected}}
+								<form method="POST" action="/machines/user/add/{{.ID}}" style="flex: 1;">
+									<div class="form-group">
+										<input type="text" name="name" placeholder="Nombre VM usuario" required>
+									</div>
+									<div class="form-group">
+										<input type="text" name="owner" placeholder="Dueño" required>
+									</div>
+									<button type="submit" class="btn btn-success">Crear VM Usuario</button>
+								</form>
+							{{end}}
+						</div>
+
+						<div class="button-group">
+							{{if .IsConnected}}
+								<form method="POST" action="/disks/{{.ID}}/disconnect" style="flex: 1;">
+									<button type="submit" class="btn btn-warning">Desconectar</button>
+								</form>
+							{{end}}
+							<form method="DELETE" action="/disks/{{.ID}}" style="flex: 1;">
+								<button type="submit" class="btn btn-danger" {{if .IsConnected}}disabled{{end}}>Eliminar</button>
+							</form>
+						</div>
+					</div>
+					{{end}}
+				{{else}}
+					<div class="empty-state">
+						<p>No hay discos. Crea uno desde una máquina base.</p>
+					</div>
+				{{end}}
+			</section>
+
+			<!-- Sección: Máquinas de Usuario -->
+			<section class="section">
+				<h2>👤 Máquinas Virtuales de Usuario</h2>
+				{{if .UserMachines}}
+					{{range .UserMachines}}
+					<div class="card">
+						<h3>{{.Name}}</h3>
+						<p>Dueño: {{.Owner}}</p>
+						<p>{{.Description}}</p>
+						<p>
+							{{if .IsRunning}}
+								<span class="status online">En línea</span>
+							{{else}}
+								<span class="status offline">Apagada</span>
+							{{end}}
+						</p>
+						{{if .KeysReady}}
+							<p><span class="status ready">✓ Llaves Usuario</span></p>
+						{{else}}
+							<p><span class="status pending">⏳ Sin llaves</span></p>
+						{{end}}
+						
+						<div class="button-group">
+							{{if not .KeysReady}}
+								<form method="POST" action="/machines/user/{{.ID}}/keys" style="flex: 1;">
+									<div class="form-group">
+										<input type="text" name="username" placeholder="Nombre de usuario" required>
+									</div>
+									<button type="submit" class="btn btn-success">Crear Llaves Usuario</button>
+								</form>
+							{{else}}
+								<a href="/machines/user/{{.ID}}/keys/user/download" class="btn btn-success">Descargar Llaves</a>
+							{{end}}
+						</div>
+
+						<div class="button-group">
+							<form method="DELETE" action="/machines/user/{{.ID}}" style="flex: 1;">
+								<button type="submit" class="btn btn-danger">Eliminar VM</button>
+							</form>
+						</div>
+					</div>
+					{{end}}
+				{{else}}
+					<div class="empty-state">
+						<p>No hay máquinas de usuario. Crea una desde un disco.</p>
+					</div>
+				{{end}}
+			</section>
+		</div>
+	</div>
+</body>
+</html>

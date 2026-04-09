@@ -1,0 +1,63 @@
+# Binarios
+*.exe
+*.dll
+*.so
+*.dylib
+vm-manager
+
+# Go
+*.go.bak
+go.sum
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Archivos locales
+.env
+config.local.yaml
+
+# Llaves SSH (IMPORTANTE: Nunca commitear)
+.vm_manager/
+ssh_keys/
+*.pem
+id_rsa*
+!id_rsa.pub.example
+
+# Logs
+*.log
+logs/
+
+# Temporales
+tmp/
+temp/
+dist/
+
+# Backup
+*.bak
+*.backup
+*~
+
+# Coverage
+*.out
+coverage.html
+
+# Build output
+bin/
+build/
+out/
+
+# VirtualBox
+*.vdi
+*.iso
+*.vmdk
+VirtualBox VMs/*
+!VirtualBox VMs/.gitkeep
+
+# Otros
+*.pprof
+debug.log
