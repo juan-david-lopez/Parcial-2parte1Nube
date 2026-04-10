@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"sync"
@@ -170,6 +169,7 @@ func (ac *AppContext) CreateMediaDisk(c echo.Context) error {
 	ac.mu.Unlock()
 
 	return c.Redirect(http.StatusSeeOther, "/")
+}
 
 // AddUserMachine agrega una máquina virtual de usuario
 func (ac *AppContext) AddUserMachine(c echo.Context) error {

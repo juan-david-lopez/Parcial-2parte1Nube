@@ -6,8 +6,8 @@ import "time"
 type MachineType string
 
 const (
-	BaseMachine MachineType = "base"
-	UserMachine MachineType = "user"
+	MachineTypeBase MachineType = "base"
+	MachineTypeUser MachineType = "user"
 )
 
 // BaseMachine representa una máquina virtual base
